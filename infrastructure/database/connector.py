@@ -3,6 +3,7 @@ import os
 import threading
 
 from sqlalchemy import Engine, event, select, delete
+from sqlalchemy.dialects.sqlite.aiosqlite import AsyncAdapt_aiosqlite_connection
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 
 from infrastructure.database.base import Base
@@ -11,9 +12,10 @@ from infrastructure.database.tables import HostnameLocation, IPLocation
 
 @event.listens_for(Engine, "connect")
 def set_sqlite_pragma(dbapi_connection, connection_record):
-    cursor = dbapi_connection.cursor()
-    cursor.execute("PRAGMA foreign_keys=ON")
-    cursor.close()
+    if isinstance(dbapi_connection, AsyncAdapt_aiosqlite_connection):
+        cursor = dbapi_connection.cursor()
+        cursor.execute("PRAGMA foreign_keys=ON")
+        cursor.close()
 
 
 class DatabaseSingleton:
