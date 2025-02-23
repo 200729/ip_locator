@@ -1,0 +1,2 @@
+[flake8]
+select = F401, F821  # check for unused imports and undefined names
